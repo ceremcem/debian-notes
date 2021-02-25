@@ -5,7 +5,16 @@ safe_source () { [[ ! -z ${1:-} ]] && source $1; _dir="$(cd "$(dirname "${BASH_S
 show_help(){
     cat <<HELP
 
-    $(basename $0) --name package-name dep1 [dep2 ...]
+    $(basename $0) --name package-name PACKAGES
+
+	PACKAGES:
+	  Either space separated list:
+
+            dep1 dep2 ...
+
+          Or read from file:
+
+            -f path/to/packages.txt
 
 HELP
 }
@@ -30,6 +39,7 @@ die(){
 # Initialize parameters
 name=
 version="1.0"
+packages_from_file=
 # ---------------------------
 args_backup=("$@")
 args=()
@@ -48,6 +58,11 @@ while :; do
         --version) shift
             [[ -z ${1:-} ]] && die "Provide version information."
             version="$1"
+            ;;
+	--file|-f) shift
+            packages_from_file=$(grep -v "^#" $1 \
+                                  | sed -e 's/#.*//g' \
+                                  | tr '\n' ',')
             ;;
         # --------------------------------------------------------
         -*) # Handle unrecognized options
@@ -68,7 +83,7 @@ done; set -- "${args_backup[@]}"
 # use ${args[@]} for new positional arguments  
 
 [[ -z ${name:-} ]] && die "Name is required."
-[[ ${#args[@]} -eq 0 ]] && die "You should provide at least one dependency."
+[[ ${#args[@]} -eq 0 ]] && [[ -z $packages_from_file ]] && die "You should provide at least one dependency."
 deps=("${args[@]}")
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
@@ -102,7 +117,7 @@ Package: $package_name
 Version: $version
 # Maintainer: Your Name <yourname@example.com>
 # Pre-Depends: <comma-separated list of packages>
-Depends: $(join_by , "${deps[@]}")
+Depends: $(join_by , "${deps[@]}") $packages_from_file
 # Recommends: <comma-separated list of packages>
 # Suggests: <comma-separated list of packages>
 # Provides: <comma-separated list of packages>
