@@ -1,3 +1,4 @@
+printer-driver-all
 earlyoom
 cups
 firmware-linux-nonfree
