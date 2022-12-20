@@ -18,6 +18,10 @@ Ensure that your /etc/apt/sources.list[.d/*] files have the same `release` alias
 > See https://unix.stackexchange.com/a/545609/65781
 
 * Enable backports
-* apt-get update 
-* `sudo apt-get install -t buster-backports linux-image-amd64 btrfs-progs`
+* `sudo apt update` 
+* `sudo apt install -t bullseye-backports linux-image-amd64 btrfs-progs linux-headers-amd64`
+* `sudo apt install -t bullseye-backports firmware-linux --reinstall`
+* `sudo dkms autoinstall`
+* Check VirtualBox (try to start an existing VM)
+> Not sure: * `sudo apt install --reinstall -o Dpkg::Options::="--force-confask,confnew,confmiss" grub-common os-prober`
 
